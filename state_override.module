@@ -1,0 +1,11 @@
+<?php
+
+/**
+* Implements hook_boot.
+*/
+function drop_boot() {
+  global $config;
+  foreach ($config['state'] as $key => $value) {
+    state_set($key, $value);
+  }
+}
