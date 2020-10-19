@@ -3,9 +3,11 @@
 /**
 * Implements hook_boot.
 */
-function drop_boot() {
+function state_override_boot() {
   global $config;
-  foreach ($config['state'] as $key => $value) {
-    state_set($key, $value);
-  }
+  if (!empty($config)) {
+    foreach ($config['state'] as $key => $value) {
+      state_set($key, $value);
+    }
+  } 
 }
