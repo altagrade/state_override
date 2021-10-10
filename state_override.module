@@ -9,5 +9,22 @@ function state_override_boot() {
     foreach ($config['state'] as $key => $value) {
       state_set($key, $value);
     }
-  } 
+  }
+}
+
+/**
+ * Implements hook_init.
+ */
+function state_override_init() {
+  global $config;
+  if (!empty($config['module'])) {
+    foreach ($config['module'] as $module => $state) {
+      if ($state == TRUE && module_exists($module) == FALSE) {
+        module_enable(array($module), FALSE);
+      }
+      else {
+        module_disable(array($module), FALSE);
+      }
+    }
+  }
 }
