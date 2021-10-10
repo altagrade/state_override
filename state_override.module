@@ -5,7 +5,7 @@
 */
 function state_override_boot() {
   global $config;
-  if (!empty($config)) {
+  if (!empty($config['state'])) {
     foreach ($config['state'] as $key => $value) {
       state_set($key, $value);
     }
@@ -19,10 +19,10 @@ function state_override_init() {
   global $config;
   if (!empty($config['module'])) {
     foreach ($config['module'] as $module => $state) {
-      if ($state == TRUE && module_exists($module) == FALSE) {
+      if ($state == TRUE && !module_exists($module)) {
         module_enable(array($module), FALSE);
       }
-      else {
+      elseif ($state == FALSE && module_exists($module)) {
         module_disable(array($module), FALSE);
       }
     }
