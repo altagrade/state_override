@@ -1,10 +1,22 @@
 <?php
 
 /**
-* Implements hook_boot.
-*/
+ * Implements hook_boot.
+ *
+ * This function is triggered during the bootstrap phase of Backdrop CMS.
+ * It sets custom application states based on the configuration provided
+ * in the global `$config` variable. The states set here can be used
+ * throughout the lifecycle of a request.
+ *
+ * @global array $config
+ *   An associative array containing configuration settings.
+ *   The 'state' key in `$config` holds key-value pairs where each key
+ *   represents a unique state identifier, and each value is the state to set.
+ */
 function state_override_boot() {
   global $config;
+
+  // Check if there are state configurations defined and apply them.
   if (!empty($config['state'])) {
     foreach ($config['state'] as $key => $value) {
       state_set($key, $value);
@@ -14,9 +26,25 @@ function state_override_boot() {
 
 /**
  * Implements hook_init.
+ *
+ * This function runs during the initialization phase of Backdrop CMS.
+ * It manages module states (enable/disable) and adjusts user role
+ * permissions based on the global `$config` array. Modules and permissions
+ * specified in `$config` are enabled, disabled, or modified dynamically.
+ *
+ * @global array $config
+ *   An associative array with configuration data:
+ *   - 'module': An array where each key is a module name, and each value is
+ *     a boolean indicating whether the module should be enabled (`TRUE`) or
+ *     disabled (`FALSE`).
+ *   - 'role': An associative array where each key is a user role name,
+ *     and each value is an array of permissions for that role.
+ *     Each permission is mapped to a boolean (`TRUE` to grant, `FALSE` to revoke).
  */
 function state_override_init() {
   global $config;
+
+  // Manage module enable/disable states based on configuration.
   if (!empty($config['module'])) {
     foreach ($config['module'] as $module => $state) {
       if ($state == TRUE && !module_exists($module)) {
@@ -24,6 +52,29 @@ function state_override_init() {
       }
       elseif ($state == FALSE && module_exists($module)) {
         module_disable(array($module), FALSE);
+      }
+    }
+  }
+
+  // Adjust role permissions based on configuration.
+  if (!empty($config['role'])) {
+    foreach ($config['role'] as $role => $permissions) {
+      // Retrieve current permissions for the specified role.
+      $config_permissions = config_get('user.role.' . $role, 'permissions');
+
+      // Add or remove permissions as specified in the configuration.
+      foreach ($permissions as $permission => $access) {
+        if ($access == TRUE && !in_array($permission, $config_permissions)) {
+          // Add permission if not already present.
+          $config_permissions[] = $permission;
+          config_set('user.role.' . $role, 'permissions', $config_permissions);
+        }
+        elseif ($access == FALSE && in_array($permission, $config_permissions)) {
+          // Remove permission if it currently exists.
+          $key = array_search($permission, $config_permissions);
+          unset($config_permissions[$key]);
+          config_set('user.role.' . $role, 'permissions', $config_permissions);
+        }
       }
     }
   }

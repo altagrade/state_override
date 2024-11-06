@@ -3,3 +3,5 @@ description = Makes possible to override "state" values via settings.php file.
 backdrop = 1.x
 type = module
 package = System
+maintainers[alanmels] = Alan Mels
+maintainers_wanted = TRUE
