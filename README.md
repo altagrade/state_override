@@ -37,7 +37,7 @@ Installation
 
 - Install and enable the State Override module using the official Backdrop CMS instructions at
   https://backdropcms.org/user-guide/modules;
-- Alternatively, use [Brush](https://backdropcms.org/project/brush) to download,
+- Alternatively, use [Bee](https://backdropcms.org/project/bee) to download,
   install, and enable it with a single CLI command: `brush -y en state_override`.
 
 Usage
